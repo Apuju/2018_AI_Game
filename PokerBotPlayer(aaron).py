@@ -174,9 +174,8 @@ class PokerSocket(object):
                         myHand=player['hand']['message']
                         amIFold = isFold
                     else:
-                        print player
                         if (player['isSurvive']):
-                            playerHands.append(player['hand']['message'])
+                            playerHands.append('{}:isFold={};isAllIn={}'.format(player['hand']['message'], player['folded'], player['allIn']))
                 print '>> round set finished'
                 with open('output_training.csv', 'ab') as csvfile:
                     spamwriter = csv.writer(csvfile, delimiter=',')
@@ -216,7 +215,11 @@ class PokerSocket(object):
                 self.takeAction(event_name, data)
         except Exception, e:
             print e.message
+            self.ws.close()
+            print 'shut down the connection and wait a while to resume'
+            time.sleep(5)
             self.doListen()
+
 
 class PotOddsPokerBot(PokerBot):
 
@@ -607,8 +610,9 @@ if __name__ == '__main__':
         connect_url = 'ws://poker-training.vtr.trendnet.org:3001'
         simulation_number=100
         bet_tolerance=0.1
-        myPokerBot=FreshPokerBot()
+        #myPokerBot=FreshPokerBot()
         #myPokerBot=MontecarloPokerBot(simulation_number)
-        #myPokerBot=PotOddsPokerBot(preflop_threshold_Tight,aggresive_threshold,bet_tolerance)
+        myPokerBot=PotOddsPokerBot(preflop_threshold_Tight,aggresive_threshold,bet_tolerance)
+        #myPokerBot = PotOddsPokerBot_MinionGo(preflop_threshold_Tight, aggresive_threshold, bet_tolerance)
         myPokerSocket=PokerSocket(playerName, connect_url, myPokerBot)
         myPokerSocket.doListen()
