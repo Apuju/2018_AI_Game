@@ -54,7 +54,7 @@ class Logger(object):
         streamFormatter = logging.Formatter('%(message)s')
         streamHandler.setFormatter(streamFormatter)
         self.logger.addHandler(streamHandler)
-        rotatingFileHandler = logging.handlers.RotatingFileHandler('Debug_TaxHoldem.log', 'a', 5*1024*1024, 10, 'utf-8')
+        rotatingFileHandler = logging.handlers.RotatingFileHandler('Debug_TaxHoldem.log', 'a', 2*1024*1024, 10, 'utf-8')
         rotatingFileHandler.setLevel(logging.DEBUG)
         rotatingFileFormatter = logging.Formatter('%(asctime)s:Line%(lineno)s[%(levelname)s]%(funcName)s>>%(message)s')
         rotatingFileHandler.setFormatter((rotatingFileFormatter))
@@ -118,18 +118,18 @@ class PokerSocket(object):
         self.logger.debug('enter function')
         round = self.getRoundName(data['game']['roundName'], self.board)
         self.logger.info('round name={}'.format(round))
-        chips = data['self']['chips']
+        self.my_Chips = data['self']['chips']
         hands = data['self']['cards']
         self.raise_count = data['game']['raiseCount']
         self.bet_count = data['game']['betCount']
-        self.my_Chips=chips
         self.playerGameName=data['self']['playerName']
         self.my_Call_Bet = data['self']['minBet']
-        self.my_Raise_Bet = int(chips / 4)
+        #self.my_Raise_Bet = int(self.my_Chips / 4)
+        self.my_Raise_Bet = self.my_Call_Bet * 2.0
         self.hole = []
         for card in (hands):
             self.hole.append(getCard(card))
-        self.logger.debug('my Chips:{}, my Hands:{}'.format(str(chips), str(self.hole)))
+        self.logger.debug('my Chips:{}, my Hands:{}'.format(str(self.my_Chips), str(self.hole)))
         self.logger.debug('table bet={}, current call bet={}, current raise bet={}'.format(str(self.Table_Bet), str(self.my_Call_Bet), str(self.my_Raise_Bet)))
         # aggresive_Tight = PokerBotPlayer(preflop_threshold_Tight, aggresive_threshold)
         # tightAction, tightAmount = aggresive_Tight.declareAction(hole, board, round, my_Raise_Bet, my_Call_Bet,Table_Bet,number_players)
@@ -144,7 +144,6 @@ class PokerSocket(object):
         self.pokerbot.total_number_players = self.total_number_players
         self.logger.debug('isSomebodyAllIn={}, isRiverRaise={}, isTurnRaise={}, isFlopRaise={}'.format(str(self.isSomebodyAllIn), str(self.isRiverRaise), str(self.isTurnRaise), str(self.isFlopRaise)))
         action, amount = self.pokerbot.declareAction(self.hole, self.board, round, self.my_Raise_Bet, self.my_Call_Bet, self.Table_Bet, self.number_players, self.raise_count, self.bet_count, self.my_Chips, self.total_bet)
-        self.total_bet += amount
         return action, amount
 
     def takeAction(self, action, data):
@@ -154,6 +153,7 @@ class PokerSocket(object):
             if action == '__new_round':
                 self.myPocketChips = data['table']['initChips']
                 self.total_number_players = len(data['players'])
+                self.logger.debug('init Chips={}'.format(float(self.myPocketChips)))
             elif action == "__show_action" or action == '__deal':
                 self.board = []
                 for card in data['table']['board']:
@@ -210,6 +210,7 @@ class PokerSocket(object):
                         "playerName": self.playerName,
                         "amount": amount
                     }}))
+                self.total_bet += amount
                 tableNumber = data['tableNumber']
                 self.board = []
                 for card in data['game']['board']:
@@ -245,7 +246,7 @@ class PokerSocket(object):
                                          str(self.isFlopRaise),
                                          ', '.join(str(hand) for hand in playerActions)])
             elif action == "__round_end":
-                self.total_bet=0
+                self.total_bet = 0
                 players=data['players']
                 isWin=False
                 myWinChips=0
@@ -272,13 +273,14 @@ class PokerSocket(object):
                     if (winMoney > 0):
                         tableChips = winMoney
                     playerid=player['playerName']
+                    #self.logger.debug(player)
                     if (self.playerGameName == playerid):
                         myChips = player['chips']
                         if (winMoney == 0):
                             isWin = False
                         else:
                             isWin = True
-                        myWinChips = winMoney
+                        myWinChips = float(winMoney)
                         myHand=player['hand']['message']
                         amIFold = isFold
                         amIAllIn = isAllIn
@@ -288,6 +290,9 @@ class PokerSocket(object):
                 myLosedChips = 0.0
                 if self.myPocketChips > myChips:
                     myLosedChips = self.myPocketChips - myChips
+                    self.myPocketChips = myChips
+                else:
+                    self.myPocketChips += float(myWinChips)
                 self.logger.info('round set finished')
                 with open(self.gameSetResultFile, 'ab') as csvfile:
                     spamwriter = csv.writer(csvfile, delimiter=',')
@@ -475,8 +480,9 @@ class PotOddsPokerBot(PokerBot):
         self.logger.debug('enter function, hole={}, board={}, round={}, my_Raise_Bet={}, my_Call_Bet={}, Table_Bet={}, number_players={}, raise_count={}, bet_count={}, my_Chips={}, total_my_bet={}'.format(str(hole), str(board), str(round), str(my_Raise_Bet), str(my_Call_Bet), str(Table_Bet), str(number_players), str(raise_count), str(bet_count), str(my_Chips), str(total_my_bet)))
         # Aggresive -tight
         # preflop->flop->turn->river
+        amount = 0
         self.number_players = number_players
-        my_Raise_Bet = (my_Chips * self.bet_tolerance) / (1 - self.bet_tolerance)
+        #my_Raise_Bet = (my_Chips * self.bet_tolerance) / (1 - self.bet_tolerance)
         self.predictedScore = HandEvaluator.evaluate_hand(hole, board)
         #score = math.pow(score, self.number_players)
         raiseTableOdds = self.calcTableOdds(my_Raise_Bet, total_my_bet, Table_Bet)
@@ -486,15 +492,17 @@ class PotOddsPokerBot(PokerBot):
         if (self.isSomebodyAllIn):
             self.logger.debug('isSomebodyAllIn={}, always fold'.format(str(self.isSomebodyAllIn)))
             action = 'fold'
-            amount = 0
         else:
             if round == 'preflop':
                 if self.predictedScore >= 0.7:
-                    action = 'raise'
-                    amount = my_Raise_Bet
+                    if self.predictedScore >= raiseTableOdds:
+                        action = 'raise'
+                    elif self.predictedScore >= callTableOdds:
+                        action = 'call'
+                    else:
+                        action = 'fold'
                 else:
                     action = 'fold'
-                    amount = 0
             elif round == 'turn':
                 if self.predictedScore >= 0.9:
                     action = 'allin'
@@ -546,42 +554,36 @@ class PotOddsPokerBot(PokerBot):
                 if self.predictedScore >= 0.8:
                     if self.predictedScore >= raiseTableOdds:
                         action = 'raise'
-                        amount = my_Raise_Bet
                     else:
                         action = 'call'
-                        amount = my_Call_Bet
                 elif self.predictedScore >= 0.7:
                     if self.predictedScore >= raiseTableOdds:
                         action = 'raise'
-                        amount = my_Raise_Bet
                     elif self.predictedScore >= callTableOdds:
                         action = 'call'
-                        amount = my_Call_Bet
                     else:
                         action = 'fold'
-                        amount = 0
                 else:
                     if self.predictedScore >= callTableOdds:
                         action = 'call'
-                        amount = my_Call_Bet
                     else:
                         action = 'fold'
-                        amount = 0
                 # interaction with player
                 if action != 'raise' and self.isFlopRaise:
                     action = 'fold'
-                    amount = 0
                 elif action == 'call' and not self.isFlopRaise \
                         and (self.number_players / float(self.total_number_players) < 0.5):
                     action = 'raise'
-                    amount = my_Raise_Bet
         self.logger.debug('Round={}, Rank={}, Rank Decision={}'.format(str(round), str(self.predictedScore), action))
         if action == 'call':
             self.predictedTableOdds = callTableOdds
+            amount = my_Call_Bet
         elif action == 'raise':
             self.predictedTableOdds = raiseTableOdds
+            amount = my_Raise_Bet
         elif action == 'allin':
             self.predictedTableOdds = allInTableOdds
+            amount = my_Chips
         return action, amount
 
         #self.predictedWinRate = self.get_win_prob(hole, board, 1000, number_players)
