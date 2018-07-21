@@ -88,6 +88,9 @@ class PokerSocket(object):
     isRiverRaise = False
     whoRiverRaise = []
     logger = None
+    matchCount = 0
+    totalEarnedChips = 0.0
+    avgEarnedChips = 0.0
 
     def __init__(self, playerName, connect_url, pokerbot):
         self.pokerbot=pokerbot
@@ -181,8 +184,8 @@ class PokerSocket(object):
                         if data['action']['playerName'] in self.whoAllIn:
                             self.whoAllIn.remove(data['action']['playerName'])
 
+                    self.logger.info('player action={}'.format(data['action']))
                     self.logger.debug('isTurnRaise={}, whoTrunRaise={}, isRiverRaise={}, whoRiverRaise={}, isSomebodyAllIn={}, whoAllIn={}'.format(str(self.isTurnRaise), self.whoTrunRaise, str(self.isRiverRaise), self.whoRiverRaise, str(self.isSomebodyAllIn), self.whoAllIn))
-
             elif action == "__action" or action == "__bet":
                 action, amount = self.getAction(data)
                 self.logger.debug("action={}, amount={}".format(action, amount))
@@ -281,7 +284,14 @@ class PokerSocket(object):
                 self.pokerbot.game_over(isWin, winChips, data)
             elif action == "__game_over":
                 self.logger.info('game match over')
+                self.matchCount += 1
                 self.logger.debug('data={}'.format(data))
+                for player in data['players']:
+                    if (self.playerGameName == player['playerName']):
+                        self.totalEarnedChips += float(player['chips'])
+                        self.avgEarnedChips = self.totalEarnedChips / float(self.matchCount)
+                        break
+                self.logger.info('total my earned chips={}, average my earned chips={} with {} matches'.format(str(self.totalEarnedChips), str(self.avgEarnedChips), str(self.matchCount)))
                 time.sleep(5)
                 self.logger.info('try to join game match')
                 self.ws.send(json.dumps({
