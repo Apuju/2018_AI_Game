@@ -2,8 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="897c6216-bca8-4f3e-a379-86e481060390" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/GameSet_Result.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/GameSet_Result_Template.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/PokerBotPlayer(aaron).py" beforeDir="false" afterPath="$PROJECT_DIR$/PokerBotPlayer(aaron).py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_training.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output_training.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RoundAction_Result.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/RoundAction_Result_Template.csv" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,24 +22,39 @@
       <file leaf-file-name="PokerBotPlayer(aaron).py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/PokerBotPlayer(aaron).py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="471">
-              <caret line="143" column="43" selection-start-line="143" selection-start-column="43" selection-end-line="143" selection-end-column="43" />
+            <state relative-caret-position="274">
+              <caret line="262" column="41" lean-forward="true" selection-start-line="262" selection-start-column="41" selection-end-line="262" selection-end-column="41" />
               <folding>
                 <element signature="e#14#45#0" expanded="true" />
                 <element signature="e#254#886#0" />
                 <element signature="e#1016#1875#0" />
                 <element signature="e#916#1292#0" />
-                <element signature="e#2794#2926#0" />
-                <element signature="e#1972#2064#0" />
+                <element signature="e#10615#11968#0" />
+                <element signature="e#14003#14735#0" />
+                <element signature="e#13290#14495#0" />
+                <element signature="e#13193#13898#0" />
+                <element signature="e#14996#23231#0" />
+                <element signature="e#15278#15483#0" />
+                <element signature="e#15541#15706#0" />
+                <element signature="e#16481#16670#0" />
                 <element signature="e#6461#6562#0" />
                 <element signature="e#6608#7126#0" />
                 <element signature="e#7189#7436#0" />
-                <element signature="e#13149#14755#0" />
                 <element signature="e#17649#17797#0" />
+                <element signature="e#18628#19659#1" />
                 <element signature="e#11780#17247#0" />
-                <element signature="e#10836#14089#0" />
-                <element signature="e#28539#29159#0" />
-                <element signature="e#29196#30349#0" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="hand_evaluator.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/pokereval/hand_evaluator.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-100">
+              <caret line="328" column="8" selection-start-line="328" selection-start-column="8" selection-end-line="328" selection-end-column="8" />
+              <folding>
+                <element signature="e#4368#10887#0" />
               </folding>
             </state>
           </provider>
@@ -44,11 +64,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>my_call_bet</find>
-      <find>getAction</find>
-      <find>pokerbot</find>
-      <find>game over</find>
-      <find>__join</find>
       <find>declareAction</find>
       <find>my_Raise_Bet</find>
       <find>PotOddsPokerBot</find>
@@ -69,6 +84,16 @@
       <find>aaron</find>
       <find>hand_sample</find>
       <find>print</find>
+      <find>self.logger.debug</find>
+      <find>client-server=</find>
+      <find>round name</find>
+      <find>passive_threshold</find>
+      <find>whotu</find>
+      <find>myChips</find>
+      <find>number_players</find>
+      <find>self.number_players</find>
+      <find>players</find>
+      <find>whoTrunRaise</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -173,18 +198,17 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.099434115" />
       <window_info anchor="bottom" id="TODO" order="9" weight="0.3293348" />
       <window_info anchor="bottom" id="Messages" />
       <window_info anchor="bottom" id="Event Log" order="0" sideWeight="0.50052685" side_tool="true" weight="0.32897604" />
-      <window_info anchor="bottom" id="Find" order="4" weight="0.23336968" />
+      <window_info anchor="bottom" id="Find" order="4" visible="true" weight="0.18429662" />
       <window_info anchor="bottom" id="Version Control" order="1" weight="0.045801528" />
       <window_info anchor="bottom" id="Python Console" order="2" weight="0.3293348" />
       <window_info anchor="bottom" id="Run" order="5" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info active="true" anchor="right" id="Terminal" order="3" sideWeight="0.49947312" visible="true" weight="0.31183368" />
+      <window_info active="true" anchor="right" id="Terminal" order="3" sideWeight="0.49947312" visible="true" weight="0.6439232" />
       <window_info id="Favorites" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="6" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -275,16 +299,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/pokereval/hand_evaluator.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="230">
-          <caret line="80" column="37" selection-start-line="80" selection-start-column="37" selection-end-line="80" selection-end-column="37" />
-          <folding>
-            <element signature="e#4368#10887#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/pokereval/lookup_tables.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1320">
@@ -292,26 +306,39 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/venv/Lib/site-packages/pokereval/hand_evaluator.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-100">
+          <caret line="328" column="8" selection-start-line="328" selection-start-column="8" selection-end-line="328" selection-end-column="8" />
+          <folding>
+            <element signature="e#4368#10887#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/PokerBotPlayer(aaron).py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="471">
-          <caret line="143" column="43" selection-start-line="143" selection-start-column="43" selection-end-line="143" selection-end-column="43" />
+        <state relative-caret-position="274">
+          <caret line="262" column="41" lean-forward="true" selection-start-line="262" selection-start-column="41" selection-end-line="262" selection-end-column="41" />
           <folding>
             <element signature="e#14#45#0" expanded="true" />
             <element signature="e#254#886#0" />
             <element signature="e#1016#1875#0" />
             <element signature="e#916#1292#0" />
-            <element signature="e#2794#2926#0" />
-            <element signature="e#1972#2064#0" />
+            <element signature="e#10615#11968#0" />
+            <element signature="e#14003#14735#0" />
+            <element signature="e#13290#14495#0" />
+            <element signature="e#13193#13898#0" />
+            <element signature="e#14996#23231#0" />
+            <element signature="e#15278#15483#0" />
+            <element signature="e#15541#15706#0" />
+            <element signature="e#16481#16670#0" />
             <element signature="e#6461#6562#0" />
             <element signature="e#6608#7126#0" />
             <element signature="e#7189#7436#0" />
-            <element signature="e#13149#14755#0" />
             <element signature="e#17649#17797#0" />
+            <element signature="e#18628#19659#1" />
             <element signature="e#11780#17247#0" />
-            <element signature="e#10836#14089#0" />
-            <element signature="e#28539#29159#0" />
-            <element signature="e#29196#30349#0" />
           </folding>
         </state>
       </provider>
