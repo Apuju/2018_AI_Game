@@ -351,12 +351,17 @@ class PokerSocket(object):
             while 1:
                 msg = json.loads(self.ws.recv())
                 self.takeAction(msg["eventName"], msg["data"])
-        except Exception, e:
-            self.logger.error(e.message)
-            self.ws.close()
-            self.logger.info('shut down the connection and wait a while to resume')
+        except Exception as e:
+            self.logger.error('exception={}'.format(e.message))
+            if self.ws is not None:
+                if isinstance(self.ws, basestring):
+                    self.logger.error('self.ws={}'.format(self.ws))
+                else:
+                    self.logger.info('shut down the connection')
+                    self.ws.close()
+            self.logger.info('wait a while to resume')
             time.sleep(5)
-            self.doListen()
+            #self.doListen()
 
 class PotOddsPokerBot(PokerBot):
 
@@ -852,4 +857,5 @@ if __name__ == '__main__':
         myPokerSocket.gameMatchResultFile = gameMatchResultFile
         myPokerSocket.gameSetResultFile = gameSetResultFile
         myPokerSocket.roundActionResultFile = roundActionResultFile
-        myPokerSocket.doListen()
+        while 1:
+            myPokerSocket.doListen()
