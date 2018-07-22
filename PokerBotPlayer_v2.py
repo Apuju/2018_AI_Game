@@ -373,6 +373,7 @@ class PotOddsPokerBot(PokerBot):
     whoFlopRaise = []
     logger = None
     total_number_players = 0
+    haveIRaised = False
 
     def __init__(self, preflop_tight_loose_threshold, aggresive_passive_threshold, bet_tolerance, logger):
         self.preflop_tight_loose_threshold = preflop_tight_loose_threshold
@@ -383,6 +384,16 @@ class PotOddsPokerBot(PokerBot):
     def game_over(self, isWin, winChips, data):
         self.logger.debug('enter function')
         self.logger.info("game set over")
+        self.isSomebodyAllIn = False
+        self.whoAllIn = []
+        self.isTurnRaise = False
+        self.whoTurnRaise = []
+        self.isRiverRaise = False
+        self.whoRiverRaise = []
+        self.isFlopRaise = False
+        self.whoFlopRaise = []
+        self.total_number_players = 0
+        self.haveIRaised = False
         self.logger.debug('win chips={}, response data={}'.format(str(winChips), data))
 
     def isSomeoneComboRaise(self):
@@ -489,91 +500,109 @@ class PotOddsPokerBot(PokerBot):
         callTableOdds = self.calcTableOdds(my_Call_Bet, total_my_bet, Table_Bet)
         allInTableOdds = self.calcTableOdds(my_Chips, total_my_bet, Table_Bet)
         self.logger.debug('my_Raise_Bet={}, bet_tolerance={}, predictedScore={}, raiseTableOdds={}, callTableOdds={}, allInTableOdds={}, total_number_players={}'.format(str(my_Raise_Bet), str(self.bet_tolerance), str(self.predictedScore), str(raiseTableOdds), str(callTableOdds), str(allInTableOdds), str(self.total_number_players)))
-        if (self.isSomebodyAllIn):
-            self.logger.debug('isSomebodyAllIn={}, always fold'.format(str(self.isSomebodyAllIn)))
-            action = 'fold'
-        else:
-            if round == 'preflop':
-                if self.predictedScore >= 0.7:
-                    if self.predictedScore >= raiseTableOdds:
-                        action = 'raise'
-                    elif self.predictedScore >= callTableOdds:
-                        action = 'call'
-                    else:
-                        action = 'fold'
-                else:
-                    action = 'fold'
-            elif round == 'turn':
-                if self.predictedScore >= 0.9:
-                    action = 'allin'
-                    amount = my_Chips
-                elif self.predictedScore >= 0.7:
-                    if self.predictedScore >= raiseTableOdds:
-                        action = 'raise'
-                        amount = my_Raise_Bet
-                    elif self.predictedScore >= callTableOdds:
-                        action = 'call'
-                        amount = my_Call_Bet
-                    else:
-                        action = 'fold'
-                        amount = 0
-                else:
-                    action = 'fold'
-                    amount = 0
-                # interaction with player
-                if action != 'raise' and self.isTurnRaise:
-                    action = 'fold'
-                    amount = 0
-                elif action == 'call' and not self.isTurnRaise \
-                        and (self.number_players / float(self.total_number_players) < 0.5):
+        fightingHeartBreak_threshold = 0.95
+        if round == 'preflop':
+            bet_threshold = 0.8
+            if self.predictedScore >= bet_threshold:
+                if self.predictedScore >= raiseTableOdds:
                     action = 'raise'
-                    amount = my_Raise_Bet
-            elif round == 'river':
-                if self.predictedScore >= 0.8:
-                    action = 'allin'
-                    amount = my_Chips
-                elif self.predictedScore >= 0.6:
-                    if self.predictedScore >= raiseTableOdds:
-                        action = 'raise'
-                        amount = my_Raise_Bet
-                    else:
-                        action = 'call'
-                        amount = my_Call_Bet
                 else:
-                    action = 'fold'
-                    amount = 0
-                #interaction with player
-                if action != 'raise' and self.isRiverRaise:
-                    action = 'fold'
-                    amount = 0
-                elif action == 'call' and not self.isRiverRaise \
-                        and (self.number_players / float(self.total_number_players) < 0.5):
-                    action = 'raise'
-                    amount = my_Raise_Bet
+                    action = 'call'
             else:
-                if self.predictedScore >= 0.8:
-                    if self.predictedScore >= raiseTableOdds:
-                        action = 'raise'
-                    else:
-                        action = 'call'
-                elif self.predictedScore >= 0.7:
-                    if self.predictedScore >= raiseTableOdds:
-                        action = 'raise'
-                    elif self.predictedScore >= callTableOdds:
-                        action = 'call'
-                    else:
-                        action = 'fold'
-                else:
-                    if self.predictedScore >= callTableOdds:
-                        action = 'call'
-                    else:
-                        action = 'fold'
-                # interaction with player
-                if action != 'raise' and self.isFlopRaise:
-                    action = 'fold'
-                elif action == 'call' and not self.isFlopRaise \
-                        and (self.number_players / float(self.total_number_players) < 0.5):
+                action = 'fold'
+            # interaction with player and humanity
+            if self.isSomebodyAllIn and self.predictedScore <= fightingHeartBreak_threshold:
+                self.logger.debug('isSomebodyAllIn={} and predictedScore {} less than {}, fold'.format(str(self.isSomebodyAllIn), str(self.predictedScore), str(fightingHeartBreak_threshold)))
+                action = 'fold'
+        elif round == 'turn':
+            bet_threshold = 0.7
+            if self.predictedScore >= 0.9:
+                action = 'allin'
+                amount = my_Chips
+            elif self.predictedScore >= bet_threshold:
+                if self.predictedScore >= raiseTableOdds:
                     action = 'raise'
+                    amount = my_Raise_Bet
+                elif self.predictedScore >= callTableOdds:
+                    action = 'call'
+                    amount = my_Call_Bet
+                else:
+                    action = 'fold'
+                    amount = 0
+            else:
+                action = 'fold'
+                amount = 0
+            # interaction with player and humanity
+            if self.isTurnRaise:
+                if action == 'call' \
+                        and not self.haveIRaised:
+                    action = 'fold'
+            elif self.number_players / float(self.total_number_players) < 0.6:
+                if self.predictedScore >= bet_threshold and action == 'fold':
+                    action = 'call'
+            elif self.haveIRaised and self.predictedScore >= bet_threshold:
+                if action == 'fold':
+                    action = 'call'
+            if self.isSomebodyAllIn and self.predictedScore <= fightingHeartBreak_threshold:
+                self.logger.debug('isSomebodyAllIn={} and predictedScore less than {}, fold'.format(str(self.isSomebodyAllIn), str(self.predictedScore), str(fightingHeartBreak_threshold)))
+                action = 'fold'
+        elif round == 'river':
+            bet_threshold = 0.65
+            if self.predictedScore >= 0.85:
+                action = 'allin'
+                amount = my_Chips
+            elif self.predictedScore >= bet_threshold:
+                if self.predictedScore >= raiseTableOdds:
+                    action = 'raise'
+                    amount = my_Raise_Bet
+                else:
+                    action = 'call'
+                    amount = my_Call_Bet
+            else:
+                action = 'fold'
+                amount = 0
+            # interaction with player and humanity
+            if self.isRiverRaise:
+                if action == 'call' \
+                        and not self.haveIRaised:
+                    action = 'fold'
+            elif self.number_players / float(self.total_number_players) < 0.7:
+                if self.predictedScore >= bet_threshold and action == 'fold':
+                    action = 'call'
+            elif self.haveIRaised and self.predictedScore >= bet_threshold:
+                if action == 'fold':
+                    action = 'call'
+            if self.isSomebodyAllIn and self.predictedScore <= fightingHeartBreak_threshold:
+                self.logger.debug('isSomebodyAllIn={} and predictedScore less than {}, fold'.format(str(self.isSomebodyAllIn), str(self.predictedScore), str(fightingHeartBreak_threshold)))
+                action = 'fold'
+        else:
+            bet_threshold = 0.75
+            if self.predictedScore >= bet_threshold:
+                if self.predictedScore >= raiseTableOdds:
+                    action = 'raise'
+                elif self.predictedScore >= callTableOdds:
+                    action = 'call'
+                else:
+                    action = 'fold'
+            else:
+                if self.predictedScore >= callTableOdds:
+                    action = 'call'
+                else:
+                    action = 'fold'
+            # interaction with player and humanity
+            if self.isFlopRaise:
+                if action == 'call' \
+                        and not self.haveIRaised:
+                    action = 'fold'
+            elif self.number_players / float(self.total_number_players) < 0.5:
+                if self.predictedScore >= bet_threshold and action == 'fold':
+                    action = 'call'
+            elif self.haveIRaised and self.predictedScore >= bet_threshold:
+                if action == 'fold':
+                    action = 'call'
+            if self.isSomebodyAllIn and self.predictedScore <= fightingHeartBreak_threshold:
+                self.logger.debug('isSomebodyAllIn={} and predictedScore less than {}, fold'.format(str(self.isSomebodyAllIn), str(self.predictedScore), str(fightingHeartBreak_threshold)))
+                action = 'fold'
         self.logger.debug('Round={}, Rank={}, Rank Decision={}'.format(str(round), str(self.predictedScore), action))
         if action == 'call':
             self.predictedTableOdds = callTableOdds
@@ -581,6 +610,7 @@ class PotOddsPokerBot(PokerBot):
         elif action == 'raise':
             self.predictedTableOdds = raiseTableOdds
             amount = my_Raise_Bet
+            self.haveIRaised = True
         elif action == 'allin':
             self.predictedTableOdds = allInTableOdds
             amount = my_Chips
