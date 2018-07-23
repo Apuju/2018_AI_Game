@@ -842,10 +842,10 @@ if __name__ == '__main__':
         #myPokerBot=PotOddsPokerBot(preflop_threshold_Loose,passive_threshold,bet_tolerance)
         #myPokerBot=PotOddsPokerBot(preflop_threshold_Tight,passive_threshold,bet_tolerance)
 
-        playerName = "c3b0cc70c2504124998b88d57b7fc0c6"
-        #playerName = 'icebreaker'
-        connect_url = "ws://poker-battle.vtr.trendnet.org:3001"
-        #connect_url = 'ws://poker-training.vtr.trendnet.org:3001'
+        #playerName = "c3b0cc70c2504124998b88d57b7fc0c6"
+        playerName = 'icebreaker'
+        #connect_url = "ws://poker-battle.vtr.trendnet.org:3001"
+        connect_url = 'ws://poker-training.vtr.trendnet.org:3001'
         simulation_number=100
         bet_tolerance=0.1
         #myPokerBot=FreshPokerBot()
