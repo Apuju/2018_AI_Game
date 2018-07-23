@@ -359,9 +359,6 @@ class PokerSocket(object):
                 else:
                     self.logger.info('shut down the connection')
                     self.ws.close()
-            self.logger.info('wait a while to resume')
-            time.sleep(5)
-            #self.doListen()
 
 class PotOddsPokerBot(PokerBot):
 
@@ -789,6 +786,7 @@ if __name__ == '__main__':
         passive_threshold = 0.8
         preflop_threshold_Loose = 0.3
         preflop_threshold_Tight = 0.7
+        resume_connection_threshold_second = 5
         logger = Logger().logger
         timestamp = str(time.strftime('%Y%m%d%H%M%S', time.localtime()))
         gameMatchResultFile = 'GameMatch_Result_{}.csv'.format(timestamp)
@@ -844,9 +842,10 @@ if __name__ == '__main__':
         #myPokerBot=PotOddsPokerBot(preflop_threshold_Loose,passive_threshold,bet_tolerance)
         #myPokerBot=PotOddsPokerBot(preflop_threshold_Tight,passive_threshold,bet_tolerance)
 
-        #playerName = "c3b0cc70c2504124998b88d57b7fc0c6"
-        playerName = 'icebreaker'
-        connect_url = 'ws://poker-training.vtr.trendnet.org:3001'
+        playerName = "c3b0cc70c2504124998b88d57b7fc0c6"
+        #playerName = 'icebreaker'
+        connect_url = "ws://poker-battle.vtr.trendnet.org:3001"
+        #connect_url = 'ws://poker-training.vtr.trendnet.org:3001'
         simulation_number=100
         bet_tolerance=0.1
         #myPokerBot=FreshPokerBot()
@@ -857,5 +856,16 @@ if __name__ == '__main__':
         myPokerSocket.gameMatchResultFile = gameMatchResultFile
         myPokerSocket.gameSetResultFile = gameSetResultFile
         myPokerSocket.roundActionResultFile = roundActionResultFile
+        currentTime = None
+        hour = 0
+        minute = 0
         while 1:
-            myPokerSocket.doListen()
+            currentTime = time.localtime()
+            print('now is {}'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
+            hour = currentTime.tm_hour
+            minute = currentTime.tm_min
+            if (hour >= 12 and hour < 14) \
+                    or (hour >= 17 and hour < 20):
+                myPokerSocket.doListen()
+            print('wait {} second(s) to resume'.format(str(resume_connection_threshold_second)))
+            time.sleep(resume_connection_threshold_second)
