@@ -354,10 +354,9 @@ class PokerSocket(object):
         return  doActionStop
 
     def doListen(self):
-        self.logger.debug('enter function')
         try:
             self.ws = create_connection(self.connect_url)
-            self.logger.debug('join game')
+            print 'join game'
             self.ws.send(json.dumps({
                 "eventName": "__join",
                 "data": {
@@ -368,8 +367,8 @@ class PokerSocket(object):
             while doKeepGoing:
                 msg = json.loads(self.ws.recv())
                 doKeepGoing = self.takeAction(msg["eventName"], msg["data"])
-            self.logger.info('game server stopped')
-            self.logger.info('shut down the connection')
+            print 'game server stopped'
+            print 'shut down the connection'
             self.ws.close()
         except Exception as e:
             self.logger.error('exception={}'.format(e.message))
@@ -940,8 +939,9 @@ if __name__ == '__main__':
         #connect_url = "ws://poker-battle.vtr.trendnet.org:3001"
         connect_url = 'ws://poker-training.vtr.trendnet.org:3001'
         #connect_url = 'ws://poker-dev.wrs.club:3001'
-        trainMode = False
-        print 'training mode was on'
+        trainingMode = False
+        if trainingMode:
+            print 'training mode was on'
         simulation_number=100
         bet_tolerance=0.1
         #myPokerBot=FreshPokerBot()
@@ -960,9 +960,9 @@ if __name__ == '__main__':
             print('now is {}'.format(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())))
             hour = currentTime.tm_hour
             minute = currentTime.tm_min
-            if (hour >= 12 and hour < 14) \
-                    or (hour >= 17 and hour < 20) \
-                    or trainMode:
+            if (hour >= 12 and hour <= 14) \
+                    or (hour >= 17 and hour <= 20) \
+                    or trainingMode:
                 myPokerSocket.doListen()
             print('wait {} second(s) to resume'.format(str(resume_connection_threshold_second)))
             time.sleep(resume_connection_threshold_second)
