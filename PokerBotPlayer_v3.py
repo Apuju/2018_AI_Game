@@ -346,7 +346,7 @@ class PokerSocket(object):
                         "playerName": self.playerName
                     }
                 }))
-            elif action == '__game_stop':
+            elif action == '__game_stop' or action == '__lastwill':
                 doActionStop = False
         except Exception as e:
             self.logger.error(e.message)
